@@ -15,6 +15,4 @@ var (
 	DBLogName string = os.Getenv("DBLOGNAME")
 	// DB Log URL
 	DBLOGURL string = os.Getenv("DBLOGURL")
-	// Redis DB URK
-	REDISDBURL string = os.Getenv("REDISDBURL")
 )

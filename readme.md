@@ -1,15 +1,12 @@
 ## Framework
 
 - Web : Echo
-- Database : ArangoDB, Redis
+- Database : ArangoDB
+- Message broker : nats
 
 ## Architecture
 
 Controller -> Service -> Repository
-
-## API Spec
-
-Not yet
 
 Referensi:
 https://github.com/khannedy/golang-clean-architecture

@@ -7,6 +7,12 @@ type (
 		Message string      `json:"message,omitempty"`
 		Status  bool        `json:"status"`
 	}
+
+	GetByIDOrderResponse struct {
+		ID     string      `json:"id"`
+		Number string      `json:"number"`
+		Menus  interface{} `json:"menus"`
+	}
 )
 
 func Success(code int, data interface{}) *GeneralResponse {

@@ -1,0 +1,2 @@
+Error Logger:	order_repository_impl.go:57: Error reading document document not found
+Error Logger:	order_service_impl.go:91: error when get by id

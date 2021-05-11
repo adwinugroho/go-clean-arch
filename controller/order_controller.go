@@ -28,6 +28,7 @@ func (route *OrderRoute) New(c echo.Context) error {
 	ctx := context.Background()
 	body := new(request.CreateOrderLRequest)
 	c.Bind(body)
+	// validation are here soon
 	response := route.service.AddData(ctx, *body)
 	return c.JSON(response.Code, response)
 }

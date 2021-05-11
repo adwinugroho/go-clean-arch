@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go-clean-arch/config"
 	"go-clean-arch/entity"
+	"go-clean-arch/logger"
 	"log"
 
 	"github.com/arangodb/go-driver"
@@ -52,11 +53,8 @@ func (db *OrderRepository) GetByID(id string) (*entity.Order, error) {
 		return nil, err
 	}
 	_, err = col.ReadDocument(ctx, id, &order)
-	if driver.IsNotFound(err) {
-		return nil, nil
-	}
 	if err != nil {
-		log.Printf("[GetByID] Error reading document, cause: %+v\n", err)
+		logger.ErrorLogger.Println("Error reading document", err)
 		return nil, err
 	}
 

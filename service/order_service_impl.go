@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"encoding/json"
+	"go-clean-arch/config"
 	"go-clean-arch/entity"
 	"go-clean-arch/models/request"
 	"go-clean-arch/models/response"
@@ -55,6 +57,22 @@ func (service *OrderService) AddData(ctx context.Context, req request.CreateOrde
 	}
 	err := service.OrderRepository.Insert(newOrder)
 	if err != nil {
+		return response.Error(500, "Internal Server Error, Please Contact Customer Service")
+	}
+	// pub to channel
+	pub, err := config.ConnectNats()
+	if err != nil {
+		return response.Error(500, "Internal Server Error, Please Contact Customer Service")
+	}
+	plPublish := entity.Order{
+		ID:   newOrder.ID,
+		Data: newOrder.Data,
+	}
+	plBytes, err := json.Marshal(plPublish)
+	if err != nil {
+		return response.Error(500, "Internal Server Error, Please Contact Customer Service")
+	}
+	if err := pub.Stan.Publish(config.CH_ORDER, plBytes); err != nil {
 		return response.Error(500, "Internal Server Error, Please Contact Customer Service")
 	}
 

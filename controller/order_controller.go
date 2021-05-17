@@ -3,7 +3,10 @@ package route
 import (
 	"context"
 	"go-clean-arch/models/request"
+	resModel "go-clean-arch/models/response"
 	"go-clean-arch/service"
+	"go-clean-arch/service/validation"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
@@ -28,7 +31,10 @@ func (route *OrderRoute) New(c echo.Context) error {
 	ctx := context.Background()
 	body := new(request.CreateOrderLRequest)
 	c.Bind(body)
-	// validation are here soon
+	messageValidate, errValidate := validation.ValidateCreateOrder(*body)
+	if errValidate != nil {
+		return c.JSON(http.StatusOK, resModel.Error(400, messageValidate))
+	}
 	response := route.service.AddData(ctx, *body)
 	return c.JSON(response.Code, response)
 }
@@ -36,6 +42,10 @@ func (route *OrderRoute) New(c echo.Context) error {
 func (route *OrderRoute) Get(c echo.Context) error {
 	body := new(request.GetByIDorderRequest)
 	c.Bind(body)
+	messageValidate, errValidate := validation.ValidateGetOrder(*body)
+	if errValidate != nil {
+		return c.JSON(http.StatusOK, resModel.Error(400, messageValidate))
+	}
 	response := route.service.GetDataByID(*body)
 	return c.JSON(response.Code, response)
 }

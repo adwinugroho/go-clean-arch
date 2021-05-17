@@ -2,12 +2,12 @@ package request
 
 type (
 	CreateOrderLRequest struct {
-		Number string `json:"number"`
+		Number string `json:"number" validate:"required"`
 		Menus  []Menu `json:"menus"`
 	}
 
 	GetByIDorderRequest struct {
-		ID string `json:"id"`
+		ID string `json:"id" validate:"required"`
 	}
 
 	Menu struct {

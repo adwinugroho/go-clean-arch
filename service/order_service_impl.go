@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"go-clean-arch/config"
 	"go-clean-arch/entity"
-	"go-clean-arch/logger"
 	"go-clean-arch/models/request"
 	"go-clean-arch/models/response"
 	"go-clean-arch/pkg/helper"
 	"go-clean-arch/repository"
+	"log"
 )
 
 func NewOrderService(repository repository.OrderRepositoryUsecase, auditRepository repository.AuditRepositoryUsecase) OrderServiceUsecase {
@@ -27,7 +27,7 @@ type OrderService struct {
 func (service *OrderService) AddData(ctx context.Context, req request.CreateOrderLRequest) *response.GeneralResponse {
 	// validation
 	if req.Number == "" || len(req.Menus) == 0 {
-		logger.ErrorLogger.Println("error cause number or menus empty")
+		log.Println("error cause number or menus empty")
 		return response.Error(400, "Invalid Data")
 	}
 
@@ -59,13 +59,13 @@ func (service *OrderService) AddData(ctx context.Context, req request.CreateOrde
 	}
 	err := service.OrderRepository.Insert(newOrder)
 	if err != nil {
-		logger.ErrorLogger.Println("error when insert to DB")
+		log.Println("error when insert to DB")
 		return response.Error(500, "Internal Server Error, Please Contact Customer Service")
 	}
 	// pub to channel
 	pub, err := config.ConnectNats()
 	if err != nil {
-		logger.ErrorLogger.Println("error when connection to nats")
+		log.Println("error when connection to nats")
 		return response.Error(500, "Internal Server Error, Please Contact Customer Service")
 	}
 	plPublish := entity.Order{
@@ -74,11 +74,11 @@ func (service *OrderService) AddData(ctx context.Context, req request.CreateOrde
 	}
 	plBytes, err := json.Marshal(plPublish)
 	if err != nil {
-		logger.ErrorLogger.Println("error when marshalling payload for publish")
+		log.Println("error when marshalling payload for publish")
 		return response.Error(500, "Internal Server Error, Please Contact Customer Service")
 	}
 	if err := pub.Stan.Publish(config.CH_ORDER, plBytes); err != nil {
-		logger.ErrorLogger.Println("error cause can't publish to channel order")
+		log.Println("error cause can't publish to channel order")
 		return response.Error(500, "Internal Server Error, Please Contact Customer Service")
 	}
 
@@ -88,10 +88,10 @@ func (service *OrderService) AddData(ctx context.Context, req request.CreateOrde
 func (service *OrderService) GetDataByID(req request.GetByIDorderRequest) *response.GeneralResponse {
 	data, err := service.OrderRepository.GetByID(req.ID)
 	if err != nil {
-		logger.ErrorLogger.Println("error when get by id")
+		log.Println("error when get by id")
 		return response.Error(500, "Internal Server Error, Please Contact Customer Service")
 	} else if data == nil || req.ID == "" {
-		logger.ErrorLogger.Println("id not found")
+		log.Println("id not found")
 		return response.Error(404, "Data Not Found")
 	}
 	resp := response.GetByIDOrderResponse{

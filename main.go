@@ -5,11 +5,13 @@ import (
 	route "go-clean-arch/controller"
 	"go-clean-arch/repository"
 	"go-clean-arch/service"
+	"log"
 
 	"github.com/labstack/echo/v4"
 )
 
 func main() {
+	log.SetFlags(log.Lshortfile | log.Ldate)
 	getConnection := config.NewArangoDBDatabase()
 	getRepository := repository.NewOrderRepository(getConnection)
 	getRepositoryAudit := repository.NewAuditRepository(getConnection)

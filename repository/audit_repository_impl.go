@@ -10,17 +10,17 @@ import (
 	"github.com/arangodb/go-driver"
 )
 
-type AuditRepository struct {
+type AuditRepositoryImp struct {
 	DBLog driver.Database
 }
 
-func NewAuditRepository(conn *config.ArangoDB) AuditRepositoryUsecase {
-	return &AuditRepository{
+func NewAuditRepository(conn *config.ArangoDB) AuditRepository {
+	return &AuditRepositoryImp{
 		DBLog: conn.DBLog,
 	}
 }
 
-func (db *AuditRepository) InsertLog(model entity.Audit) error {
+func (db *AuditRepositoryImp) InsertLog(model entity.Audit) error {
 	ctx := context.Background()
 	audit := entity.Audit{}
 	audit.ID = fmt.Sprintf("%s-%d", audit.ID, audit.CurrNo)

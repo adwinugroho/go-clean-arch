@@ -13,11 +13,11 @@ import (
 
 type (
 	OrderRoute struct {
-		service service.OrderServiceUsecase
+		service service.OrderService
 	}
 )
 
-func NewOrderRoute(service service.OrderServiceUsecase) OrderRoute {
+func NewOrderRoute(service service.OrderService) OrderRoute {
 	return OrderRoute{service: service}
 }
 

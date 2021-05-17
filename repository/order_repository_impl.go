@@ -10,17 +10,17 @@ import (
 	"github.com/arangodb/go-driver"
 )
 
-type OrderRepository struct {
+type OrderRepositoryImp struct {
 	DBLive driver.Database
 }
 
-func NewOrderRepository(conn *config.ArangoDB) OrderRepositoryUsecase {
-	return &OrderRepository{
+func NewOrderRepository(conn *config.ArangoDB) OrderRepository {
+	return &OrderRepositoryImp{
 		DBLive: conn.DBLive,
 	}
 }
 
-func (db *OrderRepository) Insert(model entity.Order) error {
+func (db *OrderRepositoryImp) Insert(model entity.Order) error {
 	ctx := context.Background()
 	order := entity.Order{}
 
@@ -42,7 +42,7 @@ func (db *OrderRepository) Insert(model entity.Order) error {
 	return nil
 }
 
-func (db *OrderRepository) GetByID(id string) (*entity.Order, error) {
+func (db *OrderRepositoryImp) GetByID(id string) (*entity.Order, error) {
 	ctx := context.Background()
 	order := entity.Order{}
 

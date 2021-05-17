@@ -3,7 +3,7 @@ package repository
 import "go-clean-arch/entity"
 
 type (
-	AuditRepositoryUsecase interface {
+	AuditRepository interface {
 		InsertLog(model entity.Audit) error
 	}
 )

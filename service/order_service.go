@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	OrderServiceUsecase interface {
+	OrderService interface {
 		AddData(ctx context.Context, req request.CreateOrderLRequest) *response.GeneralResponse
 		GetDataByID(req request.GetByIDorderRequest) *response.GeneralResponse
 	}

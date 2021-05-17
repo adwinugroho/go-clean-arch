@@ -12,19 +12,19 @@ import (
 	"log"
 )
 
-func NewOrderService(repository repository.OrderRepositoryUsecase, auditRepository repository.AuditRepositoryUsecase) OrderServiceUsecase {
-	return &OrderService{
+func NewOrderService(repository repository.OrderRepository, auditRepository repository.AuditRepository) OrderService {
+	return &OrderServiceImp{
 		OrderRepository: repository,
 		AuditRepository: auditRepository,
 	}
 }
 
-type OrderService struct {
-	OrderRepository repository.OrderRepositoryUsecase
-	AuditRepository repository.AuditRepositoryUsecase
+type OrderServiceImp struct {
+	OrderRepository repository.OrderRepository
+	AuditRepository repository.AuditRepository
 }
 
-func (service *OrderService) AddData(ctx context.Context, req request.CreateOrderLRequest) *response.GeneralResponse {
+func (service *OrderServiceImp) AddData(ctx context.Context, req request.CreateOrderLRequest) *response.GeneralResponse {
 	// validation
 	if req.Number == "" || len(req.Menus) == 0 {
 		log.Println("error cause number or menus empty")
@@ -85,7 +85,7 @@ func (service *OrderService) AddData(ctx context.Context, req request.CreateOrde
 	return response.Success(200, nil)
 }
 
-func (service *OrderService) GetDataByID(req request.GetByIDorderRequest) *response.GeneralResponse {
+func (service *OrderServiceImp) GetDataByID(req request.GetByIDorderRequest) *response.GeneralResponse {
 	data, err := service.OrderRepository.GetByID(req.ID)
 	if err != nil {
 		log.Println("error when get by id")

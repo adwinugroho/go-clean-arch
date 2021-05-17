@@ -6,5 +6,6 @@ type (
 	OrderRepository interface {
 		Insert(model entity.Order) error
 		GetByID(id string) (*entity.Order, error)
+		DeleteByID(id string) error
 	}
 )

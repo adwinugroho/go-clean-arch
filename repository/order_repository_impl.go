@@ -42,6 +42,21 @@ func (db *OrderRepositoryImp) Insert(model entity.Order) error {
 	return nil
 }
 
+func (db *OrderRepositoryImp) DeleteByID(id string) error {
+	ctx := context.Background()
+	col, err := db.DBLive.Collection(ctx, "order_test")
+	if err != nil {
+		log.Printf("[DeleteByID] Error open connection to collection, cause: %+v\n", err)
+		return err
+	}
+	_, err = col.RemoveDocument(ctx, id)
+	if err != nil {
+		log.Println("Error reading document")
+		return err
+	}
+	return nil
+}
+
 func (db *OrderRepositoryImp) GetByID(id string) (*entity.Order, error) {
 	ctx := context.Background()
 	order := entity.Order{}

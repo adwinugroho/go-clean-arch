@@ -19,5 +19,6 @@ func main() {
 	initRoute := route.NewOrderRoute(getService)
 	e := echo.New()
 	initRoute.Route(e)
+	service.ListenNats(getRepository)
 	e.Logger.Fatal(e.Start(":3003"))
 }

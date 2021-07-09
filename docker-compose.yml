@@ -1,0 +1,28 @@
+version: "3.7"
+services:
+    web:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: order_api
+        ports:
+            - 3003:3003
+        volumes:
+            - ./config.json:/app/config.json
+            
+        arangodb_db_container:
+            image: arangodb:latest
+            environment:
+                ARANGO_ROOT_PASSWORD: password
+                DBNAME: prototyping_go
+                DBLOGNAME: prototyping_go
+                DBUSERNAME: adwpractice
+                
+                ports:
+                    - 8529:8529
+                volumes:
+                    - arangodb_data_container:/var/lib/arangodb3
+                    - arangodb_apps_data_container:/var/lib/arangodb3-apps
+            volumes:
+                arangodb_data_container:
+                arangodb_apps_data_container:

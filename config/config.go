@@ -27,3 +27,5 @@ var (
 	CH_ORDER   = "CH_ORDER"
 	CH_PAYMENT = "CH_PAYMENT"
 )
+
+type UserContext string

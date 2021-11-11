@@ -16,3 +16,13 @@ type (
 		AdditionalInformation string `json:"additionalInformation"`
 	}
 )
+
+type (
+	General struct {
+		Email    string `json:"email,omitempty"`
+		Child    string `json:"child,omitempty"`
+		LangCode string `json:"langCode,omitempty"`
+		Fromd    string `json:"fromd,omitempty"`
+		User     map[string]interface{}
+	}
+)

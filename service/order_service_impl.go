@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"encoding/json"
 	"go-clean-arch/config"
 	"go-clean-arch/entity"
 	"go-clean-arch/models/request"
@@ -25,6 +24,8 @@ type OrderServiceImp struct {
 }
 
 func (service *OrderServiceImp) AddData(ctx context.Context, req request.CreateOrderLRequest) *response.GeneralResponse {
+	var userCtx config.UserContext
+	var user *request.User = ctx.Value(userCtx).(*request.User)
 	// validation
 	if req.Number == "" || len(req.Menus) == 0 {
 		log.Println("error cause number or menus empty")
@@ -51,6 +52,7 @@ func (service *OrderServiceImp) AddData(ctx context.Context, req request.CreateO
 	}
 
 	newOrder := entity.Order{
+		Owner: user.ID,
 		Data: &entity.Data{
 			Number: req.Number,
 			Menus:  entityMenus,
@@ -63,30 +65,32 @@ func (service *OrderServiceImp) AddData(ctx context.Context, req request.CreateO
 		return response.Error(500, "Internal Server Error, Please Contact Customer Service")
 	}
 	// pub to channel
-	pub, err := config.ConnectNats()
-	if err != nil {
-		log.Println("error when connection to nats")
-		return response.Error(500, "Internal Server Error, Please Contact Customer Service")
-	}
-	plPublish := entity.Order{
-		ID:   newOrder.ID,
-		Data: newOrder.Data,
-	}
-	plBytes, err := json.Marshal(plPublish)
-	if err != nil {
-		log.Println("error when marshalling payload for publish")
-		return response.Error(500, "Internal Server Error, Please Contact Customer Service")
-	}
-	if err := pub.Stan.Publish(config.CH_ORDER, plBytes); err != nil {
-		log.Println("error cause can't publish to channel order")
-		return response.Error(500, "Internal Server Error, Please Contact Customer Service")
-	}
+	// pub, err := config.ConnectNats()
+	// if err != nil {
+	// 	log.Println("error when connection to nats")
+	// 	return response.Error(500, "Internal Server Error, Please Contact Customer Service")
+	// }
+	// plPublish := entity.Order{
+	// 	ID:   newOrder.ID,
+	// 	Data: newOrder.Data,
+	// }
+	// plBytes, err := json.Marshal(plPublish)
+	// if err != nil {
+	// 	log.Println("error when marshalling payload for publish")
+	// 	return response.Error(500, "Internal Server Error, Please Contact Customer Service")
+	// }
+	// if err := pub.Stan.Publish(config.CH_ORDER, plBytes); err != nil {
+	// 	log.Println("error cause can't publish to channel order")
+	// 	return response.Error(500, "Internal Server Error, Please Contact Customer Service")
+	// }
 
 	return response.Success(200, nil)
 }
 
-func (service *OrderServiceImp) GetDataByID(req request.GetByIDorderRequest) *response.GeneralResponse {
-	data, err := service.OrderRepository.GetByID(req.ID)
+func (service *OrderServiceImp) GetDataByID(ctx context.Context, req request.GetByIDorderRequest) *response.GeneralResponse {
+	var userCtx config.UserContext
+	var user *request.User = ctx.Value(userCtx).(*request.User)
+	data, err := service.OrderRepository.GetByID(req.ID, user.ID)
 	if err != nil {
 		log.Println("error when get by id")
 		return response.Error(500, "Internal Server Error, Please Contact Customer Service")

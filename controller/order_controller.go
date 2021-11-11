@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"go-clean-arch/config"
 	"go-clean-arch/models/request"
 	resModel "go-clean-arch/models/response"
 	"go-clean-arch/service"
@@ -11,9 +12,12 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+var userContext config.UserContext
+
 type (
 	OrderRoute struct {
 		service service.OrderService
+		user    *request.User
 	}
 )
 
@@ -23,6 +27,7 @@ func NewOrderRoute(service service.OrderService) OrderRoute {
 
 func (route *OrderRoute) Route(e *echo.Echo) {
 	orderRoute := e.Group("/order")
+	orderRoute.Use(route.middlewareOrder)
 	orderRoute.POST("/new", route.New)
 	orderRoute.POST("/get", route.Get)
 }
@@ -35,7 +40,8 @@ func (route *OrderRoute) New(c echo.Context) error {
 	if errValidate != nil {
 		return c.JSON(http.StatusOK, resModel.Error(400, messageValidate))
 	}
-	response := route.service.AddData(ctx, *body)
+	ctxService := context.WithValue(ctx, userContext, route.user)
+	response := route.service.AddData(ctxService, *body)
 	return c.JSON(response.Code, response)
 }
 
@@ -46,6 +52,7 @@ func (route *OrderRoute) Get(c echo.Context) error {
 	if errValidate != nil {
 		return c.JSON(http.StatusOK, resModel.Error(400, messageValidate))
 	}
-	response := route.service.GetDataByID(*body)
+	ctxService := context.WithValue(context.Background(), userContext, route.user)
+	response := route.service.GetDataByID(ctxService, *body)
 	return c.JSON(response.Code, response)
 }

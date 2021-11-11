@@ -9,6 +9,6 @@ import (
 type (
 	OrderService interface {
 		AddData(ctx context.Context, req request.CreateOrderLRequest) *response.GeneralResponse
-		GetDataByID(req request.GetByIDorderRequest) *response.GeneralResponse
+		GetDataByID(ctx context.Context, req request.GetByIDorderRequest) *response.GeneralResponse
 	}
 )

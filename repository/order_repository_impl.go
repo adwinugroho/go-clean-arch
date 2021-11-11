@@ -57,21 +57,24 @@ func (db *OrderRepositoryImp) DeleteByID(id string) error {
 	return nil
 }
 
-func (db *OrderRepositoryImp) GetByID(id string) (*entity.Order, error) {
+func (db *OrderRepositoryImp) GetByID(id, owner string) (*entity.Order, error) {
 	ctx := context.Background()
 	order := entity.Order{}
-
-	col, err := db.DBLive.Collection(ctx, "order_test")
+	var bindVars = map[string]interface{}{
+		"owner": owner,
+		"id":    id,
+	}
+	query := `FOR x IN order_test FILTER x.owner == @owner AND x._key == @id RETURN x`
+	cursor, err := db.DBLive.Query(ctx, query, bindVars)
 	if err != nil {
 		log.Printf("[GetByID] Error open connection to collection, cause: %+v\n", err)
 		return nil, err
 	}
-	_, err = col.ReadDocument(ctx, id, &order)
-	if driver.IsNotFound(err) {
+	_, err = cursor.ReadDocument(ctx, &order)
+	if driver.IsNoMoreDocuments(err) {
 		log.Println("data nil or id not found")
 		return nil, nil
-	}
-	if err != nil {
+	} else if err != nil {
 		log.Println("Error reading document")
 		return nil, err
 	}

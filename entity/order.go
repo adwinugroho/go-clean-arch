@@ -5,6 +5,7 @@ type (
 	Order struct {
 		ID    string `json:"_key,omitempty"`
 		Data  *Data  `json:"data"`
+		Owner string `json:"owner"`
 		Audit *Audit `json:"audit,omitempty"`
 	}
 

@@ -3,8 +3,9 @@ package controller
 import (
 	"context"
 	"go-clean-arch/config"
+	"go-clean-arch/models"
 	"go-clean-arch/models/request"
-	resModel "go-clean-arch/models/response"
+	"go-clean-arch/models/response"
 	"go-clean-arch/service"
 	"go-clean-arch/service/validation"
 	"net/http"
@@ -38,11 +39,14 @@ func (route *OrderRoute) New(c echo.Context) error {
 	c.Bind(body)
 	messageValidate, errValidate := validation.ValidateCreateOrder(*body)
 	if errValidate != nil {
-		return c.JSON(http.StatusOK, resModel.Error(400, messageValidate))
+		return c.JSON(http.StatusOK, models.NewError(400, messageValidate))
 	}
 	ctxService := context.WithValue(ctx, userContext, route.user)
-	response := route.service.AddData(ctxService, *body)
-	return c.JSON(response.Code, response)
+	err := route.service.AddData(ctxService, *body)
+	if err != nil {
+		return c.JSON(http.StatusOK, err.(*models.Error))
+	}
+	return c.JSON(http.StatusOK, response.Success(200))
 }
 
 func (route *OrderRoute) Get(c echo.Context) error {
@@ -50,9 +54,12 @@ func (route *OrderRoute) Get(c echo.Context) error {
 	c.Bind(body)
 	messageValidate, errValidate := validation.ValidateGetOrder(*body)
 	if errValidate != nil {
-		return c.JSON(http.StatusOK, resModel.Error(400, messageValidate))
+		return c.JSON(http.StatusOK, models.NewError(400, messageValidate))
 	}
 	ctxService := context.WithValue(context.Background(), userContext, route.user)
-	response := route.service.GetDataByID(ctxService, *body)
-	return c.JSON(response.Code, response)
+	respData, err := route.service.GetDataByID(ctxService, *body)
+	if err != nil {
+		return c.JSON(http.StatusOK, err.(*models.Error))
+	}
+	return c.JSON(http.StatusOK, response.Success(200).SetData(respData))
 }

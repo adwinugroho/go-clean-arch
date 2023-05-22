@@ -7,6 +7,7 @@ import (
 	"go-clean-arch/service"
 	"log"
 
+	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 )
 
@@ -18,6 +19,7 @@ func main() {
 	getService := service.NewOrderService(getRepository, getRepositoryAudit)
 	initRoute := route.NewOrderRoute(getService)
 	e := echo.New()
+	initRoute.Validator = validator.New()
 	initRoute.Route(e)
 	// pubsub keyspace notif expire redis
 	//subscribe.ValidateExpireUID()

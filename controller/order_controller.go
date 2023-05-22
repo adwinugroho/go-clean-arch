@@ -7,9 +7,9 @@ import (
 	"go-clean-arch/models/request"
 	"go-clean-arch/models/response"
 	"go-clean-arch/service"
-	"go-clean-arch/service/validation"
 	"net/http"
 
+	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 )
 
@@ -17,8 +17,9 @@ var userContext config.UserContext
 
 type (
 	OrderRoute struct {
-		service service.OrderService
-		user    *request.User
+		service   service.OrderService
+		user      *request.User
+		Validator *validator.Validate
 	}
 )
 
@@ -37,9 +38,9 @@ func (route *OrderRoute) New(c echo.Context) error {
 	ctx := context.Background()
 	body := new(request.CreateOrderLRequest)
 	c.Bind(body)
-	messageValidate, errValidate := validation.ValidateCreateOrder(*body)
+	errValidate := route.Validate(body)
 	if errValidate != nil {
-		return c.JSON(http.StatusOK, models.NewError(400, messageValidate))
+		return c.JSON(http.StatusBadRequest, errValidate)
 	}
 	ctxService := context.WithValue(ctx, userContext, route.user)
 	err := route.service.AddData(ctxService, *body)
@@ -52,9 +53,9 @@ func (route *OrderRoute) New(c echo.Context) error {
 func (route *OrderRoute) Get(c echo.Context) error {
 	body := new(request.GetByIDorderRequest)
 	c.Bind(body)
-	messageValidate, errValidate := validation.ValidateGetOrder(*body)
+	errValidate := route.Validate(body)
 	if errValidate != nil {
-		return c.JSON(http.StatusOK, models.NewError(400, messageValidate))
+		return c.JSON(http.StatusBadRequest, errValidate)
 	}
 	ctxService := context.WithValue(context.Background(), userContext, route.user)
 	respData, err := route.service.GetDataByID(ctxService, *body)

@@ -1,16 +1,16 @@
-package validation
+package controller
 
 import (
 	"fmt"
-	"go-clean-arch/models/request"
+	"go-clean-arch/models"
 	"log"
+	"net/http"
 
 	"github.com/go-playground/validator"
 )
 
-func ValidateCreateOrder(request request.CreateOrderLRequest) (string, error) {
-	validate := validator.New()
-	err := validate.Struct(request)
+func (route *OrderRoute) Validate(i interface{}) error {
+	err := route.Validator.Struct(i)
 	if err != nil {
 		log.Printf("Error when validate:%+v", err)
 		var errMessage string
@@ -26,8 +26,8 @@ func ValidateCreateOrder(request request.CreateOrderLRequest) (string, error) {
 				}
 			}
 		}
-		return errMessage, err
+		// log.Println("error message:", errMessage)
+		return models.NewError(http.StatusBadRequest, errMessage)
 	}
-
-	return "", nil
+	return nil
 }
